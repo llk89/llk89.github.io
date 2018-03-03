@@ -1,37 +1,5 @@
-## Welcome to GitHub Pages
+## Welcome to My Blog
 
-You can use the [editor on GitHub](https://github.com/llk89/llk89.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+Um, this blog begins since 2018-3-4. I'm primary an undergrad wandering around the IT field. I have no idea in which direction I should go.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/llk89/llk89.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Anyway, I decided to start learning SSM, the so called "better" J2EE framework. This may be seen as lagging behind, but I know people use it for a reason. After all, I'm still just an undergrad.
