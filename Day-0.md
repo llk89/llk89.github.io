@@ -1,0 +1,25 @@
+## Today's progress
+
+I found a good start: [http://how2j.cn/k/ssm/ssm-tutorial/1137.html] After fiddling a bit I went straight to the
+[http://how2j.cn/k/ssm/ssm-maven/1394.html](so called maven style) because I got very nervous at the very moment I see the first page
+asking me to download a whole bunch of dependencies with **firefox**. Later I found that `gradle init` can convert it into a gradle project,
+but no luck. There seems to be something wrong... no time to fix it. Let's focus on the key subject. Old maven can still do the job.
+
+I've updated it a bit. Now it includes a new functionality: appendPages. This will append a category "categoryX", where X is the total 
+row count, to the db.
+
+I noticed a strange behavior, that `/listCategory`, an unmodified endpoint, is taking an extrodinary long time to make an respond. I've no
+exact idea on this, yet the `com.github.pagehelper` looks very suspisious...
+
+---
+OK I figured out that this naive implementation is using a primitive, unpooled, inefficient data source. No doubt the database will cry out
+for too frequent connecting to it, and 
+
+>  that `/listCategory`, an unmodified endpoint, is taking an extrodinary long time to make an respond.
+
+is simply because the database load is too high. F**k that. Now everything is fixed ~~except that paging can go beyound max row or below 0, 
+which I decided to ignore~~.
+
+---
+
+I had a good time, and I call this the end of the day.
