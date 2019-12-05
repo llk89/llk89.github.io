@@ -1,0 +1,70 @@
+# Building CUDA capable containers for TX2
+
+JetPack 4.2.1 comes with experimental support for nvidia-docker on TX2. However, since it is an aarch64 platform, most off shelf CUDA images won't work.
+You cannot cross compile whatsoever on an alternative machine as well, because the only way to find CUDA for aarch64 is within the local package repository on a flashed TX2.
+
+The way to sort all these out is not easy, but it can be done.
+
+## First attempt
+
+Since CUDA repo exists on the TX2, it is possible to just use apt to install cudart and related stuff from it. 
+This is the path taken by [drewfarris](https://github.com/drewfarris/docker-cuda-arm64v8/blob/master/8.0/runtime/fixrepos.sh).
+By adapting this script to a more modern CUDA version, we can just copy paste the CUDA stuff from Dockerfile within nvidia/docker.
+
+This however can be a bit frustrating. The driver versions, available SDKs are not the same as on X86 hosts. 
+That script would also wreck havoc when you forget to start the nginx, or misconfigured port mapping.
+This also requires all your images to contain some ~2GB of CUDA library, which will be overriden by the nvidia-container-runtime anyway, at runtime. 
+This deadweight can be quite punishing when you attepmt to do OTA updates.
+
+What's more, this attempt failed for a reason I identified when trying the second attempt. In short, this attempt _just didn't work_.
+
+## Second attempt
+The deviceQuery built from nvidia-docker's provided sources can never find a suitable driver in first attempt. 
+I began to think if my copy pasting from nvidia/docker is correct.
+In a moment of genius, I start to think about _what if we just don't include it in the image, but let the nvidia-container-runtime provide it_.
+
+### nvidia-docker build
+It turns out this is quite possible!
+All you need is to select nvidia as the default runtime.
+You normally don't want (or, just can't) on a x86 host with *real* cpus, but this is an embedded device.
+There is no multiple users, nor most of security guidelines you would have to obey on a UNIX system.
+
+In the end, I have a daemon.json like this
+
+    {
+      "registry-mirrors": [
+        "https://--------.mirror.aliyuncs.com"
+      ],
+      "experimental": true,
+      "default-runtime": "nvidia",
+      "runtimes": {
+        "nvidia": {
+          "path": "nvidia-container-runtime",
+          "runtimeArgs": []
+        }
+      }
+    }
+  
+I turned on experimental because I need squashing. 
+
+### Not done yet
+However, there are some minor configurations setup to go yet.
+You can't just use a plain `arm64v8/ubuntu:xenial` or something.
+You need to change PATH and add some changes to ldconfig.
+This is quite trivial however. 
+All you need to do is to look at your TX2 hosts's `/etc/ld.so.conf.d/` and copy paste every nvidia related config into the container.
+
+This is why my first attempt failed as well. 
+The binaries never get to load the driver dynamic libraries.
+I used the ld configs for a x86 system, where they reside in some nice `/usr/local/nvidia`,
+but here on TX, some of them are in `/usr/local/cuda-10.0/targets/aarch64-linux/lib` and others are in `/usr/lib/aarch64-linux-gnu/tegra/` (notice that tegra).
+Should I have added them to the first image, it would be successful as well.
+
+The first attempt should still be avoided on TX2 though. 
+Relying on builder provided environments could be bad, as it may not be easily recreated.
+However, I value smaller image size over portablilty.
+This is real world and we have to make compromises.
+
+## Summary
+1. Use nvidia-container-runtime to build image, so as to avoid putting cuda into container image.
+2. Use ldconfig identical as the host to avoid dynamic linking problems.
